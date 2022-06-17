@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32002.261
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "atof_improved", "atof_improved\atof_improved.csproj", "{4F9198D9-3407-4153-B143-248AAE8A806B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4F9198D9-3407-4153-B143-248AAE8A806B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F9198D9-3407-4153-B143-248AAE8A806B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F9198D9-3407-4153-B143-248AAE8A806B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F9198D9-3407-4153-B143-248AAE8A806B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {98189F4E-CBB9-4D73-8457-B43CA40CB7B2}
+	EndGlobalSection
+EndGlobal
