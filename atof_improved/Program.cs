@@ -2,6 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
+using System.Globalization;
+using System.Threading;
 
 namespace atof_improved
 {
@@ -9,38 +12,54 @@ namespace atof_improved
     {
         // public static char[] chars;
         public static string[] headers;
-        static List<importedValue> importedValues = new List<importedValue>();
+        static List<importedValue> lstImportedValues = new List<importedValue>();
+        static List<outputValue> lstOutputValues = new List<outputValue>();
         static List<string[]> listOfStringLines = new List<string[]>();
         // public static string[] sepratedValues;
+        
 
         static void Main(string[] args)
         {
-            //ReadCsv(); // citanje podataka iz CSV fajla
-            //SeprateValues();
-
-            char[] arrayOfChars = new char[] { '1', '2', '3'}; // testni niz
-
-            if (CheckIfEverythingIsOk(arrayOfChars)) // validacija da li je uneti niz karaktera u dobrom formatu
+            ReadCsv(); // citanje podataka iz CSV fajla
+            
+            foreach(importedValue imp in lstImportedValues)
             {
-                Console.WriteLine(atof_improved(arrayOfChars));
+                if (!CheckIfEverythingIsOk(imp.Vrednost.ToCharArray()))
+                {
+                    Console.WriteLine("Error");
+                }
             }
-            else
-            {
-                throw new Exception("Number cannot be converted");
-            }
+
+            Calculate();
+            WriteCsv();
+          
+
+            // WriteCsv();
+
+            //char[] arrayOfChars = new char[] { '1', '2', '3'}; // testni niz
+
+            //if (CheckIfEverythingIsOk(arrayOfChars)) // validacija da li je uneti niz karaktera u dobrom formatu
+            //{
+            //    Console.WriteLine(atof_improved(arrayOfChars));
+            //}
+            //else
+            //{
+            //    throw new Exception("Number cannot be converted");
+            //}
         }
 
+       
         private static double atof_improved(char[] str)
         {
             double result = 0;
-            int numberSign = 1; // 1 - positive, -1 - negative
+            int numberSign = 1; // 1 - pozitivno, -1 - negativno
             int i = 0;
             int dIndex = 0;
             double e = 0; // incijalizujemo vrednost broja e iz naseg stringa, koja je za sada 0
 
             if (str[0].Equals('-'))
             {
-                numberSign = -1;
+                numberSign = -1; // ako je minus, menjamo znak i pomeramo iterator za 1
                 i++;
             }
 
@@ -181,42 +200,138 @@ namespace atof_improved
             {
                 headers[i] = headers[i].Trim('"');
             }
+
+            EvaluateFields(csvParser);
+        }
+        private static void ShowImportedValue(importedValue importedValue)
+        {
+            Console.WriteLine($"Datum: {importedValue.Datum}, Vrednost: {importedValue.Vrednost}, Komentar: {importedValue.Komentar}");
+
+
+        }
+        private static void EvaluateFields(TextFieldParser csvParser)
+        {
             while (!csvParser.EndOfData)
             {
-                listOfStringLines.Add(csvParser.ReadFields());
+                string line = csvParser.ReadLine();
+                char[] parameters = new char[] { ',' };
+                string[] subStrings = line.Split(parameters);
+                for (int i = 0; i < subStrings.Length; i++)
+                {
+                    subStrings[i] = subStrings[i].Trim('"');
+                }
+                string[] formats = new string[]{ "dd.M.yyyy", "dd.MM.yyyy.", "dd/M/yyyy" };
+                DateTime dt = DateTime.ParseExact(subStrings[0], formats, null );
+                lstImportedValues.Add(new importedValue(dt, subStrings[1], subStrings[2]));
             }
         }
-        private static void SeprateValues()
+        private static void WriteCsv()
         {
-            for (int i = 0; i < listOfStringLines.Count; i++)
-            {
-                string[] line = listOfStringLines[i];
+            string[] headerText = { "Mesec, Godina, UkupnoMerenja, Suma" };
+            File.WriteAllLines(@"C:\Users\Mladen PC\source\repos\atof_improved21\output.csv", headerText);
 
-                for (int j = 0; j < line.Length; j++)
-                {
-                    //sepratedValues = line[j].S
-                }
+            for(int i =0; i < lstOutputValues.Count; i++) { 
 
+                string[] forWrite = { $"{lstOutputValues[i].Mesec}", $"{lstOutputValues[i].Godina}", $"{lstOutputValues[i].UkupnoMerenja.ToString("N2")}", $"{lstOutputValues[i].Suma.ToString("N2")}" };
+                File.AppendAllLines(@"C:\Users\Mladen PC\source\repos\atof_improved21\output.csv", forWrite);   
                 
             }
-        }
 
+        }
+        private static void Calculate()
+        {
+            double sum = 0;
+            List<int> evaluatedMonths = new List<int>();
+            int counter = 0;
+
+            for(int i = 0; i < lstImportedValues.Count; i++)
+            {
+                int month = lstImportedValues[i].Datum.Month;
+                if (!evaluatedMonths.Contains(month))
+                {
+                    counter++;
+                    sum += atof_improved(lstImportedValues[i].Vrednost.ToCharArray());
+                    for (int j = i + 1; j < lstImportedValues.Count; j++)
+                    {
+                        if (lstImportedValues[j].Datum.Month == month)
+                        {
+                            sum += atof_improved(lstImportedValues[j].Vrednost.ToCharArray());
+                            counter++;
+                        }
+                    }
+
+                    evaluatedMonths.Add(month);
+                    if (!GetMonth(month).Equals("Error"))
+                    {
+                        lstOutputValues.Add(new outputValue(GetMonth(month), counter, sum));
+                    }
+                    counter = 0;
+                    sum = 0;
+                }
+                
+            }
+
+        }
+        private static void ShowOutputValue(outputValue output)
+        {
+            Console.WriteLine($"Mesec: {output.Mesec}, Godina: {output.Godina}, UkupnoMerenja: {output.UkupnoMerenja}, Suma:{output.Suma}");
+        }
+        private static string GetMonth(int monthNumber)
+        {
+            switch (monthNumber)
+            {
+                case 1: return "Januar";
+                case 2: return "Februar";
+                case 3: return "Mart";
+                case 4: return "April";
+                case 5: return "Maj";
+                case 6: return "Jun";
+                case 7: return "Jul";
+                case 8: return "Avgust";
+                case 9: return "Septembar";
+                case 10: return "Oktobar";
+                case 11: return "Novembar";
+                case 12: return "Decembar";
+                default: return "Error";
+            }
+        }
     }
 
     class importedValue
     {
-        public string Datum { get; set; }
+        public DateTime Datum { get; set; }
         public string Vrednost { get; set; }
         public string Komentar { get; set; }
         public importedValue()
         {
 
         }
-        public importedValue(string Datum, string Vrednost, string Komentar)
+        public importedValue(DateTime Datum, string Vrednost, string Komentar)
         {
             this.Datum = Datum;
             this.Vrednost = Vrednost;
             this.Komentar = Komentar;
         }
+    }
+    class outputValue
+    {
+        public string Mesec { get; set; }
+        public string Godina { get; set; }
+        public int UkupnoMerenja { get; set; }
+        public double Suma { get; set; }
+
+        public outputValue()
+        {
+
+        }
+
+        public outputValue(string Mesec, int UkupnoMerenja, double Suma)
+        {
+            this.Mesec = Mesec;
+            this.UkupnoMerenja = UkupnoMerenja;
+            this.Suma = Suma;
+            Godina = "2022";
+        }
+
     }
 }
