@@ -188,7 +188,6 @@ namespace atof_improved
             csvParser.SetDelimiters(new string[] { "," });
             csvParser.HasFieldsEnclosedInQuotes = true;
 
-
             headers = (csvParser.ReadLine()).Split(',', 3);
 
             for (int i = 0; i < headers.Length; i++)
