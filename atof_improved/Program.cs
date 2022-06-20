@@ -3,16 +3,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-using System.Globalization;
-using System.Threading;
+
 
 namespace atof_improved
 {
     class Program
     {
         public static string[] headers;
-        static List<importedValue> lstImportedValues = new List<importedValue>();
-        static List<outputValue> lstOutputValues = new List<outputValue>();
+        static List<ImportedValue> lstImportedValues = new List<ImportedValue>();
+        static List<OutputValue> lstOutputValues = new List<OutputValue>();
         static List<string[]> listOfStringLines = new List<string[]>();
         static string path;
 
@@ -212,7 +211,7 @@ namespace atof_improved
                 }
                 string[] formats = new string[]{ "dd.M.yyyy", "dd.MM.yyyy.", "dd/M/yyyy" };
                 DateTime dt = DateTime.ParseExact(subStrings[0], formats, null );
-                lstImportedValues.Add(new importedValue(dt, subStrings[1], subStrings[2]));
+                lstImportedValues.Add(new ImportedValue(dt, subStrings[1], subStrings[2]));
             }
         }
         private static void WriteCsv()
@@ -257,7 +256,7 @@ namespace atof_improved
                         evaluatedMonths.Add(month);
                         if (!GetMonth(month).Equals("Error"))
                         {
-                            lstOutputValues.Add(new outputValue(GetMonth(month), counter, sum));
+                            lstOutputValues.Add(new OutputValue(GetMonth(month), counter, sum));
                         }
                         counter = 0;
                         sum = 0;
@@ -285,40 +284,5 @@ namespace atof_improved
                 default: return "Error";
             }
         }
-    }
-
-    class importedValue
-    {
-        public DateTime Datum { get; set; }
-        public string Vrednost { get; set; }
-        public string Komentar { get; set; }
-        public importedValue()
-        {
-
-        }
-        public importedValue(DateTime Datum, string Vrednost, string Komentar)
-        {
-            this.Datum = Datum;
-            this.Vrednost = Vrednost;
-            this.Komentar = Komentar;
-        }
-    }
-    class outputValue
-    {
-        public string Mesec { get; set; }
-        public int UkupnoMerenja { get; set; }
-        public double Suma { get; set; }
-
-        public outputValue()
-        {
-
-        }
-        public outputValue(string Mesec, int UkupnoMerenja, double Suma)
-        {
-            this.Mesec = Mesec;
-            this.UkupnoMerenja = UkupnoMerenja;
-            this.Suma = Suma;
-        }
-
     }
 }
