@@ -116,6 +116,7 @@ namespace atof_improved
 
             return result * numberSign;
         }
+
         private static int GetNumberOfDecimals(int lengthDecimals)
         {
             int result = 1;
@@ -127,6 +128,7 @@ namespace atof_improved
 
             return result;
         }
+
         private static double NumEToNum(string numberE)
         {
             var digits = from c in numberE // izvlacimo u poseban niz brojeve koje se nalaze nakon znaka -/+
@@ -162,6 +164,7 @@ namespace atof_improved
 
             return (double)result;
         }
+
         private static bool CheckIfEverythingIsOk(char[] str)
         {
             foreach(char ch in str)
@@ -177,10 +180,12 @@ namespace atof_improved
             }
             return true;
         }
+
         private static bool IsNumber(char ch)
         {
             return (ch >= 48 && ch <= 57);
         }
+
         private static void ReadCsv()
         {
             TextFieldParser csvParser = new TextFieldParser(path + @"\input.csv");
@@ -197,6 +202,7 @@ namespace atof_improved
 
             EvaluateFields(csvParser);
         }
+
         private static void EvaluateFields(TextFieldParser csvParser)
         {
             while (!csvParser.EndOfData)
@@ -213,6 +219,7 @@ namespace atof_improved
                 lstImportedValues.Add(new ImportedValue(dt, subStrings[1], subStrings[2]));
             }
         }
+
         private static void WriteCsv()
         {
             string headerText = "Mesec," + "Godina," + "UkupnoMerenja," + "Suma\n";
@@ -225,6 +232,7 @@ namespace atof_improved
                 File.AppendAllText(path + @"\output.csv", forWrite);   
             }
         }
+
         private static void Calculate()
         {
             double sum = 0;
@@ -264,6 +272,7 @@ namespace atof_improved
             }
 
         }
+
         private static string GetMonth(int monthNumber)
         {
             switch (monthNumber)
@@ -283,5 +292,6 @@ namespace atof_improved
                 default: return "Error";
             }
         }
+
     }
 }
