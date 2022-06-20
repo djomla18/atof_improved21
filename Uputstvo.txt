@@ -1,4 +1,7 @@
 Kako bi se program pokrenuo i pravilno izvršio zadatak, jedino što je potrebno je da se pri pokretanju programa unese putanja do input.csv fajla.
+Program je napravljen u orkuženju Microsoft visual studio 2019 i napisan je koristeći C# programski jezik. 
+Pokretanje programa se vrši biranjem "Debug" opcije iz menija, a zatim iz padajuće liste izabrati opciju "Start without debugging".
+Pri pokretanju program će tražiti da se unese putanja do fajla input.csv.
 
 Primer ispravno unete putanje: C:\Users\Mladen PC\source\repos\atof_improved21
 
