@@ -28,7 +28,7 @@ namespace atof_improved
                 if (!CheckIfEverythingIsOk(lstImportedValues[i].Vrednost.ToCharArray()))
                 {
                     string[] error = { $"Line {i + 1} cannot be converted into a number. Original value {lstImportedValues[i].Vrednost} date {lstImportedValues[i].Datum.ToString("dd.MM.yyyy.")}" };
-                    File.WriteAllLines(@"C:\Users\Mladen PC\source\repos\atof_improved21\output.err", error);
+                    File.WriteAllLines(path + @"\output.err", error);
                     continue;
                 }
             }
@@ -199,10 +199,6 @@ namespace atof_improved
 
             EvaluateFields(csvParser);
         }
-        private static void ShowImportedValue(importedValue importedValue)
-        {
-            Console.WriteLine($"Datum: {importedValue.Datum}, Vrednost: {importedValue.Vrednost}, Komentar: {importedValue.Komentar}");
-        }
         private static void EvaluateFields(TextFieldParser csvParser)
         {
             while (!csvParser.EndOfData)
@@ -227,7 +223,7 @@ namespace atof_improved
 
             for(int i =0; i < lstOutputValues.Count; i++) { 
 
-                string forWrite = $"{lstOutputValues[i].Mesec}" + "," + $"{lstOutputValues[i].Godina}" + "," + $"{lstOutputValues[i].UkupnoMerenja}" + "," + $"{lstOutputValues[i].Suma}\n";
+                string forWrite = $"{lstOutputValues[i].Mesec}" + "," + "2022," + $"{lstOutputValues[i].UkupnoMerenja}" + "," + $"{lstOutputValues[i].Suma}\n";
                 File.AppendAllText(path + @"\output.csv", forWrite);   
             }
         }
@@ -270,10 +266,6 @@ namespace atof_improved
             }
 
         }
-        private static void ShowOutputValue(outputValue output)
-        {
-            Console.WriteLine($"Mesec: {output.Mesec}, Godina: {output.Godina}, UkupnoMerenja: {output.UkupnoMerenja}, Suma:{output.Suma}");
-        }
         private static string GetMonth(int monthNumber)
         {
             switch (monthNumber)
@@ -314,7 +306,6 @@ namespace atof_improved
     class outputValue
     {
         public string Mesec { get; set; }
-        public string Godina { get; set; }
         public int UkupnoMerenja { get; set; }
         public double Suma { get; set; }
 
@@ -327,7 +318,6 @@ namespace atof_improved
             this.Mesec = Mesec;
             this.UkupnoMerenja = UkupnoMerenja;
             this.Suma = Suma;
-            Godina = "2022";
         }
 
     }
