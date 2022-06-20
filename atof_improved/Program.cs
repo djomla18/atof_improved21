@@ -10,45 +10,32 @@ namespace atof_improved
 {
     class Program
     {
-        // public static char[] chars;
         public static string[] headers;
         static List<importedValue> lstImportedValues = new List<importedValue>();
         static List<outputValue> lstOutputValues = new List<outputValue>();
         static List<string[]> listOfStringLines = new List<string[]>();
-        // public static string[] sepratedValues;
-        
+        static string path;
 
         static void Main(string[] args)
         {
+            Console.WriteLine("Please enter the exact path of the input.csv file: ");
+            path = Console.ReadLine().Trim();
+
             ReadCsv(); // citanje podataka iz CSV fajla
             
-            foreach(importedValue imp in lstImportedValues)
+            for(int i = 0; i < lstImportedValues.Count; i++)
             {
-                if (!CheckIfEverythingIsOk(imp.Vrednost.ToCharArray()))
+                if (!CheckIfEverythingIsOk(lstImportedValues[i].Vrednost.ToCharArray()))
                 {
-                    Console.WriteLine("Error");
+                    string[] error = { $"Line {i + 1} cannot be converted into a number. Original value {lstImportedValues[i].Vrednost} date {lstImportedValues[i].Datum.ToString("dd.MM.yyyy.")}" };
+                    File.WriteAllLines(@"C:\Users\Mladen PC\source\repos\atof_improved21\output.err", error);
+                    continue;
                 }
             }
-
             Calculate();
             WriteCsv();
-          
-
-            // WriteCsv();
-
-            //char[] arrayOfChars = new char[] { '1', '2', '3'}; // testni niz
-
-            //if (CheckIfEverythingIsOk(arrayOfChars)) // validacija da li je uneti niz karaktera u dobrom formatu
-            //{
-            //    Console.WriteLine(atof_improved(arrayOfChars));
-            //}
-            //else
-            //{
-            //    throw new Exception("Number cannot be converted");
-            //}
         }
 
-       
         private static double atof_improved(char[] str)
         {
             double result = 0;
@@ -67,7 +54,7 @@ namespace atof_improved
             {
                 if(str[i] == '.')
                 {
-                    // pamtimo indeks na kojem se nalazi tacka i kada naidjemo na nju samo i povecavamo za jedan i nastavljamo dalje
+                    // pamtimo indeks na kojem se nalazi tacka i kada naidjemo na nju samo iterator povecavamo za jedan i nastavljamo dalje
                     dIndex = i; 
                     ++i;
                     continue;
@@ -112,6 +99,15 @@ namespace atof_improved
                     break;
                 }
                
+            }
+
+            if(dIndex != 0 && e == 0)
+            // Isti princip kao i kod racunanja broj decimala kada imam broj e, samo sto je ovo slucaj
+            // kada nam je kao vrednost prosledjen decimalni broj.
+            {
+                int decimalLength = str.Length - (dIndex + 1);
+                int valueDecimals = GetNumberOfDecimals(decimalLength);
+                result = result / valueDecimals;
             }
 
             if(result > double.MaxValue || result < double.MinValue)
@@ -188,7 +184,7 @@ namespace atof_improved
         }
         private static void ReadCsv()
         {
-            TextFieldParser csvParser = new TextFieldParser(@"C:\Users\Mladen PC\Desktop\input.csv");
+            TextFieldParser csvParser = new TextFieldParser(path + @"\input.csv");
 
             csvParser.SetDelimiters(new string[] { "," });
             csvParser.HasFieldsEnclosedInQuotes = true;
@@ -206,8 +202,6 @@ namespace atof_improved
         private static void ShowImportedValue(importedValue importedValue)
         {
             Console.WriteLine($"Datum: {importedValue.Datum}, Vrednost: {importedValue.Vrednost}, Komentar: {importedValue.Komentar}");
-
-
         }
         private static void EvaluateFields(TextFieldParser csvParser)
         {
@@ -227,16 +221,15 @@ namespace atof_improved
         }
         private static void WriteCsv()
         {
-            string[] headerText = { "Mesec, Godina, UkupnoMerenja, Suma" };
-            File.WriteAllLines(@"C:\Users\Mladen PC\source\repos\atof_improved21\output.csv", headerText);
+            string headerText = "Mesec," + "Godina," + "UkupnoMerenja," + "Suma\n";
+            
+            File.WriteAllText(path + @"\output.csv", headerText);
 
             for(int i =0; i < lstOutputValues.Count; i++) { 
 
-                string[] forWrite = { $"{lstOutputValues[i].Mesec}", $"{lstOutputValues[i].Godina}", $"{lstOutputValues[i].UkupnoMerenja.ToString("N2")}", $"{lstOutputValues[i].Suma.ToString("N2")}" };
-                File.AppendAllLines(@"C:\Users\Mladen PC\source\repos\atof_improved21\output.csv", forWrite);   
-                
+                string forWrite = $"{lstOutputValues[i].Mesec}" + "," + $"{lstOutputValues[i].Godina}" + "," + $"{lstOutputValues[i].UkupnoMerenja}" + "," + $"{lstOutputValues[i].Suma}\n";
+                File.AppendAllText(path + @"\output.csv", forWrite);   
             }
-
         }
         private static void Calculate()
         {
@@ -246,29 +239,34 @@ namespace atof_improved
 
             for(int i = 0; i < lstImportedValues.Count; i++)
             {
-                int month = lstImportedValues[i].Datum.Month;
-                if (!evaluatedMonths.Contains(month))
+                if (CheckIfEverythingIsOk(lstImportedValues[i].Vrednost.ToCharArray()))
                 {
-                    counter++;
-                    sum += atof_improved(lstImportedValues[i].Vrednost.ToCharArray());
-                    for (int j = i + 1; j < lstImportedValues.Count; j++)
+                    int month = lstImportedValues[i].Datum.Month;
+                    if (!evaluatedMonths.Contains(month))
                     {
-                        if (lstImportedValues[j].Datum.Month == month)
+                        counter++;
+                        sum += atof_improved(lstImportedValues[i].Vrednost.ToCharArray());
+                        for (int j = i + 1; j < lstImportedValues.Count; j++)
                         {
-                            sum += atof_improved(lstImportedValues[j].Vrednost.ToCharArray());
-                            counter++;
+                            if (CheckIfEverythingIsOk(lstImportedValues[j].Vrednost.ToCharArray()))
+                            {
+                                if (lstImportedValues[j].Datum.Month == month)
+                                {
+                                    sum += atof_improved(lstImportedValues[j].Vrednost.ToCharArray());
+                                    counter++;
+                                }
+                            }
                         }
-                    }
 
-                    evaluatedMonths.Add(month);
-                    if (!GetMonth(month).Equals("Error"))
-                    {
-                        lstOutputValues.Add(new outputValue(GetMonth(month), counter, sum));
+                        evaluatedMonths.Add(month);
+                        if (!GetMonth(month).Equals("Error"))
+                        {
+                            lstOutputValues.Add(new outputValue(GetMonth(month), counter, sum));
+                        }
+                        counter = 0;
+                        sum = 0;
                     }
-                    counter = 0;
-                    sum = 0;
                 }
-                
             }
 
         }
@@ -324,7 +322,6 @@ namespace atof_improved
         {
 
         }
-
         public outputValue(string Mesec, int UkupnoMerenja, double Suma)
         {
             this.Mesec = Mesec;
